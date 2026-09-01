@@ -23,7 +23,7 @@ class SileroVAD:
         else:
             tensor_chunk = audio_chunk.float()
     
-    with torch.no_grad():
-        speech_prob = self.model(tensor_chunk, self.config.sample_rate).item()
-    
-    return speech_prob > self.config.vad_threshold
+        with torch.no_grad():
+            speech_prob = self.model(tensor_chunk, self.config.sample_rate).item()
+        
+        return speech_prob > self.config.vad_threshold

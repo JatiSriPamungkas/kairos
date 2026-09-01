@@ -5,13 +5,15 @@ import sounddevice as sd
 from .config import AudioConfig
 from .vad import SileroVAD
 
+
 class AudioListener:
     def __init__(self, config: AudioConfig = None):
         self.config = config or AudioConfig()
         self.vad = SileroVAD(self.config)
 
         self.silence_frames_threshold = int(
-            self.config.silence_limit_sec * (self.config.sample_rate / self.config.chunk_size)
+            self.config.silence_limit_sec
+            * (self.config.sample_rate / self.config.chunk_size)
         )
 
         self.audio_queue = queue.Queue()
@@ -21,7 +23,7 @@ class AudioListener:
         if status:
             print(f"[AUDIO DRIVER STATUS]: {status}", file=sys.stderr)
         self.audio_queue.put(indata[:, 0].copy())
-    
+
     def listen(self):
         self.is_running = True
         is_speaking = False
@@ -29,11 +31,11 @@ class AudioListener:
         speech_buffer = []
 
         with sd.InputStream(
-            samplerate = self.config.sample_rate,
+            samplerate=self.config.sample_rate,
             channels=1,
-            dtype='float32',
+            dtype="float32",
             blocksize=self.config.chunk_size,
-            callback=self._audio_callback
+            callback=self._audio_callback,
         ):
             print("\n[VOICE LISTENER] Mikrofon aktif. Bicaralah sesuatu...")
 
@@ -66,4 +68,4 @@ class AudioListener:
                         yield full_audio
 
     def stop(self):
-        self.is_running = False                
+        self.is_running = False
